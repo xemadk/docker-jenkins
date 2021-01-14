@@ -19,12 +19,12 @@ pipeline {
             }
             steps {
                 echo "Building version ${VERSION} with suffix: ${VERSION_SUFFIX}"
-                sh 'dotnet build -p:VersionPrefix="${VERSION}" --version-suffix "${VERSION_RC}" ./01/src/Pi.Web/Pi.Web.csproj'
+                sh 'dotnet build -p:VersionPrefix="${VERSION}" --version-suffix "${VERSION_RC}" ./src/Pi.Web/Pi.Web.csproj'
             }
         }
         stage('Unit Test') {
             steps {
-                dir('./01/src') {
+                dir('./src') {
                     sh '''
                         dotnet test --logger "trx;LogFileName=Pi.Math.trx" Pi.Math.Tests/Pi.Math.Tests.csproj
                         dotnet test --logger "trx;LogFileName=Pi.Runtime.trx" Pi.Runtime.Tests/Pi.Runtime.Tests.csproj
@@ -35,7 +35,7 @@ pipeline {
         }
         stage('Smoke Test'){
             steps {
-                sh 'dotnet ./01/src/Pi.Web/bin/Debug/netcoreapp3.1/Pi.Web.dll'
+                sh 'dotnet ./src/Pi.Web/bin/Debug/netcoreapp3.1/Pi.Web.dll'
             }
         }
         stage('Publish') {
@@ -43,7 +43,7 @@ pipeline {
                 expression { return params.RC }
             }
             steps {
-                sh 'dotnet publish -p:VersionPrefix="${VERSION}" --version-suffix "${VERSION_RC}" ./01/src/Pi.Web/Pi.Web.csproj -o ./out'
+                sh 'dotnet publish -p:VersionPrefix="${VERSION}" --version-suffix "${VERSION_RC}" ./src/Pi.Web/Pi.Web.csproj -o ./out'
                 archiveArtifacts('out/')
             }
         }
